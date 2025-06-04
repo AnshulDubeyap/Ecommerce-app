@@ -2,6 +2,11 @@ import { Route, Routes } from "react-router-dom";
 import AuthLogin from "./pages/auth/login";
 import AuthRegister from "./pages/auth/register";
 import AuthLayout from "./components/auth/layout";
+import AdminLayout from "./components/admin-view/layout";
+import AdminDashboard from "./pages/admin-view/Dashboard";
+import AdminProducts from "./pages/admin-view/Product";
+import AdminFeatures from "./pages/admin-view/features";
+import AdminOrders from "./pages/admin-view/orders";
 
 function App() {
   return (
@@ -9,9 +14,14 @@ function App() {
       <h1>Header component</h1>
       <Routes>
         <Route path="/auth" element={<AuthLayout />}>
-          {/* ✅ Use relative paths here */}
           <Route path="login" element={<AuthLogin />} />
           <Route path="register" element={<AuthRegister />} />
+        </Route>
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="products" element={<AdminProducts />} />
+          <Route path="features" element={<AdminFeatures />} />
+          <Route path="orders" element={<AdminOrders />} />
         </Route>
       </Routes>
     </div>
