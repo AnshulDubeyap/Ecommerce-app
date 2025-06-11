@@ -3,6 +3,9 @@ const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
+//! Step-3-4, Configure the routes for authentication
+const authRoute = require("./routes/auth/authRoute");
+
 //! Create a Database Connection
 mongoose
   .connect(
@@ -25,7 +28,7 @@ const PORT = process.env.PORT || 5000;
 //? app.use is simply app uses
 app.use(
   cors({
-    origin: "http://localhost:5173/",
+    origin: "http://localhost:5173",
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: [
       "content-type",
@@ -40,6 +43,7 @@ app.use(
 
 app.use(cookieParser());
 app.use(express.json());
+app.use("/api/auth", authRoute); //! Step-3-5, Use the authRoute
 
 //! Run the Server
 app.listen(() => {
