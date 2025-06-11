@@ -3,7 +3,7 @@
 //! Step 25-1, Create register form controls
 export const registerFormControls = [
   {
-    name: "UserName",
+    name: "userName",
     label: "User Name",
     placeholder: "Enter your name",
     componentType: "input",

@@ -9,7 +9,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 //! Step-8-3, Initialize the initial State
 const initialState = {
-  UserName: "",
+  userName: "",
   email: "",
   password: "",
 };
@@ -27,7 +27,7 @@ function AuthRegister() {
     dispatch(registerUser(formData)) //! Dispatch the registerUser action with formData
       .then((data) => {
         console.log("Registration successful:", data);
-        navigate("/auth/login"); //! Navigate to the login page on successful registration
+        if (data?.payload?.success) navigate("/auth/login"); //! Navigate to login page on successful registration
       })
       .catch((error) => {
         console.error("Registration failed:", error);

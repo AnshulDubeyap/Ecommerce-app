@@ -10,6 +10,8 @@ const registerUser = async (req, res) => {
   //! Step-2-1-1, Destructure the request body to get userName, email, and password
   const { userName, email, password } = req.body;
 
+  console.log("➡️ Incoming register request body:", req.body); //?
+
   try {
     //! Step-2-1-2, Hash the password
     const hashedPassword = await bcrypt.hash(password, 12);
@@ -22,7 +24,9 @@ const registerUser = async (req, res) => {
     });
 
     //! Step-2-1-4, Save the user to the database
-    await newUser.save();
+    const savedUser = await newUser.save();
+    console.log("✅ User saved to DB:", savedUser); //?
+
     res.status(200).json({
       success: true,
       message: "User registered successfully",

@@ -46,6 +46,6 @@ app.use(express.json());
 app.use("/api/auth", authRoute); //! Step-3-5, Use the authRoute
 
 //! Run the Server
-app.listen(() => {
+app.listen(PORT, () => {
   console.log(`Server is now running in port ${PORT}`);
 });
