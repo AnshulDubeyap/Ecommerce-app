@@ -6,6 +6,7 @@ import { registerUser } from "@/store/auth-slice";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 //! Step-8-3, Initialize the initial State
 const initialState = {
@@ -27,7 +28,20 @@ function AuthRegister() {
     dispatch(registerUser(formData)) //! Dispatch the registerUser action with formData
       .then((data) => {
         console.log("Registration successful:", data);
-        if (data?.payload?.success) navigate("/auth/login"); //! Navigate to login page on successful registration
+        if (data?.payload?.success) {
+          //! Show a success toast message
+          toast(data?.payload?.message, {
+            variant: "success",
+          });
+
+          //! Navigate to login page on successful registration
+          navigate("/auth/login");
+        } else {
+          //! Show an error toast message if registration fails
+          toast(data?.payload?.message, {
+            variant: "destructive",
+          });
+        }
       })
       .catch((error) => {
         console.error("Registration failed:", error);
