@@ -45,12 +45,56 @@ const registerUser = async (req, res) => {
 
 //! Step-2-2, Login
 
-const login = async (req, res) => {
+const loginUser = async (req, res) => {
   //! Step-2-2-1, Destructure the request body to get email and password
   const { email, password } = req.body;
 
   try {
     //! Step-2-2-2, Check if the user exists
+    const checkUser = await User.findOne({ email });
+    if (!checkUser) {
+      return res.status(200).json({
+        success: false,
+        message: "User does not exist with this email, please register",
+      });
+    }
+
+    //! Step-2-2-3, Compare the password with the hashed password
+    const checkPasswordMatch = await bcrypt.compare(
+      password,
+      checkUser.password
+    );
+
+    //! Step-2-2-4, If the password does not match, return an error
+    if (!checkPasswordMatch) {
+      return res.status(200).json({
+        success: false,
+        message: "Invalid password, please try again",
+      });
+    }
+
+    //! Step-2-2-5, Create a JWT token(if user is registered and password matches)
+    const token = jwt.sign(
+      { userId: checkUser._id, role: checkUser.role, email: checkUser.email },
+      CLIENT_SECRET_KEY,
+      { expiresIn: "1d" } //! Token will expire in 1 day
+    );
+
+    //! Step-2-2-6, Set the token in the cookie
+    res
+      .cookie("token", token, {
+        httpOnly: true, //! Cookie is not accessible via JavaScript
+        secure: false,
+      })
+      .json({
+        success: true,
+        message: "User logged in successfully",
+        user: {
+          id: checkUser._id,
+          email: checkUser.email,
+          role: checkUser.role,
+        },
+      });
   } catch (e) {
     console.error("Error during login:", e);
     res.status(500).json({ success: false, message: "some error occurred" });
@@ -59,4 +103,5 @@ const login = async (req, res) => {
 
 module.exports = {
   registerUser,
+  loginUser,
 };
