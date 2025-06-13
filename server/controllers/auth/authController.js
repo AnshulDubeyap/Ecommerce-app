@@ -76,7 +76,7 @@ const loginUser = async (req, res) => {
     //! Step-2-2-5, Create a JWT token(if user is registered and password matches)
     const token = jwt.sign(
       { userId: checkUser._id, role: checkUser.role, email: checkUser.email },
-      CLIENT_SECRET_KEY,
+      "CLIENT_SECRET_KEY",
       { expiresIn: "1d" } //! Token will expire in 1 day
     );
 
