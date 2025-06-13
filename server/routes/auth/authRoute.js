@@ -29,7 +29,8 @@ router.get("/check-auth", authMiddleware, (req, res) => {
     user: {
       userName: user.userName,
       email: user.email,
-      _id: user._id,
+      userId: user.userId,
+      role: user.role,
     },
   });
 });

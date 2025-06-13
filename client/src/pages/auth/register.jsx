@@ -27,7 +27,6 @@ function AuthRegister() {
     event.preventDefault(); //! Prevent the default form submission behavior
     dispatch(registerUser(formData)) //! Dispatch the registerUser action with formData
       .then((data) => {
-        console.log("Registration successful:", data);
         if (data?.payload?.success) {
           //! Show a success toast message
           toast(data?.payload?.message, {
@@ -47,8 +46,6 @@ function AuthRegister() {
         console.error("Registration failed:", error);
       });
   }
-
-  console.log(formData);
 
   return (
     <div className="mx-auto w-full max-w-md space-y-6">

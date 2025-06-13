@@ -18,10 +18,30 @@ import ShoppingListing from "./pages/shopping-view/listing";
 import NotFound from "./pages/not-found";
 import CheckAuth from "./components/common/check-auth";
 import UnauthPage from "./pages/unauth-page";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { checkAuth } from "./store/auth-slice/index";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function App() {
-  const { user, isAuthenticated } = useSelector((state) => state.auth);
+  const { user, isAuthenticated, isLoading } = useSelector(
+    (state) => state.auth
+  );
+
+  //! Dispatch the checkAuth
+  const dispatch = useDispatch();
+
+  console.log(isLoading, user, isAuthenticated);
+
+  //! UseEffect whenever the page loads
+  useEffect(() => {
+    dispatch(checkAuth());
+  }, [dispatch]);
+
+  //! Set up a Loading Screen
+  if (isLoading) {
+    return <Skeleton className="h-[600px] w-[800px] bg-black" />;
+  }
   return (
     <div className="flex flex-col overflow-hidden bg-white">
       <h1>Header component</h1>

@@ -75,7 +75,11 @@ const loginUser = async (req, res) => {
 
     //! Step-2-2-5, Create a JWT token(if user is registered and password matches)
     const token = jwt.sign(
-      { userId: checkUser._id, role: checkUser.role, email: checkUser.email },
+      {
+        userId: checkUser._id,
+        role: checkUser.role,
+        email: checkUser.email,
+      },
       "CLIENT_SECRET_KEY",
       { expiresIn: "1d" } //! Token will expire in 1 day
     );
@@ -127,6 +131,7 @@ const authMiddleware = (req, res, next) => {
   try {
     //! Step-2-4-3, Verify the token
     const decoded = jwt.verify(token, "CLIENT_SECRET_KEY");
+    console.log("Decoded JWT →", decoded); // ✅ Add this to confirm
     req.user = decoded; //! Attach the user to the request object
     next(); //! Call the next middleware or route handler
   } catch (e) {

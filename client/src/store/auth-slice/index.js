@@ -4,7 +4,7 @@ import axios from "axios";
 //! Step-2, Create initial State
 const initialState = {
   isAuthenticated: false,
-  isLoading: false,
+  isLoading: true,
   user: null,
 };
 
@@ -38,6 +38,28 @@ const loginUser = createAsyncThunk(
       formData,
       {
         withCredentials: true, //! Allow cookies to be sent with the request
+      }
+    );
+    //! Return the response data
+    return response.data;
+  }
+);
+
+//! Creating a async thunk for middleware(cookies)
+const checkAuth = createAsyncThunk(
+  "/auth/check-auth",
+
+  async () => {
+    //! Make a POST request to the server to register the user
+    const response = await axios.get(
+      "http://localhost:5000/api/auth/check-auth",
+      {
+        withCredentials: true, //! Allow cookies to be sent with the request
+        headers: {
+          "Cache-Control":
+            "no-cache, no-store, must-revalidate, proxy-revalidate",
+          "Content-Type": "application/json",
+        },
       }
     );
     //! Return the response data
@@ -80,6 +102,19 @@ const authSlice = createSlice({
       .addCase(loginUser.rejected, (state) => {
         state.isLoading = false; //! Set loading to false when the request is rejected
         state.user = null; //! Set the user data to null when the request is rejected
+      })
+      .addCase(checkAuth.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(checkAuth.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload.user;
+        state.isAuthenticated = action.payload.success;
+      })
+      .addCase(checkAuth.rejected, (state) => {
+        state.isLoading = false;
+        state.user = null;
+        state.isAuthenticated = false;
       });
   },
 });
@@ -87,4 +122,4 @@ const authSlice = createSlice({
 //! Step-3, Export the Reducer and action
 export const { setUser } = authSlice.actions;
 export default authSlice.reducer;
-export { registerUser, loginUser }; //! Export the async thunk for use in components
+export { registerUser, loginUser, checkAuth }; //! Export the async thunk for use in components
