@@ -101,7 +101,42 @@ const loginUser = async (req, res) => {
   }
 };
 
+//! Step-2-3, Logout
+
+const logoutUser = async (req, res) => {
+  //! Step-2-3, Clear the cookie
+  res.clearCookie("token").json({
+    success: true,
+    message: "User logged out successfully",
+  });
+};
+
+//! Step-2-4, Middleware
+
+const authMiddleware = (req, res, next) => {
+  //! Step-2-4-1, Get the token from the cookie
+  const token = req.cookies.token;
+
+  //! Step-2-4-2, If the token does not exist, return an error
+  if (!token) {
+    return res.status(401).json({
+      success: false,
+      message: "Unauthorized, please login",
+    });
+  }
+  try {
+    //! Step-2-4-3, Verify the token
+    const decoded = jwt.verify(token, "CLIENT_SECRET_KEY");
+    req.user = decoded; //! Attach the user to the request object
+    next(); //! Call the next middleware or route handler
+  } catch (e) {
+    console.error("Error during authentication:", e);
+    res.status(401).json({ success: false, message: "Invalid token" });
+  }
+};
 module.exports = {
   registerUser,
   loginUser,
+  logoutUser,
+  authMiddleware,
 };
