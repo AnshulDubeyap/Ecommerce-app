@@ -1,5 +1,7 @@
 //! Step-25, Create a config file for form for dynamic rendering
 
+import { CircleCheck, LayoutDashboard, ShoppingBasket } from "lucide-react";
+
 //! Step 25-1, Create register form controls
 export const registerFormControls = [
   {
@@ -40,5 +42,26 @@ export const loginFormControls = [
     placeholder: "Enter your password",
     componentType: "input",
     type: "password",
+  },
+];
+
+export const adminSidebarMenuItems = [
+  {
+    id: "dashboard",
+    label: "dashboard",
+    path: "/admin/dashboard",
+    icon: <LayoutDashboard />,
+  },
+  {
+    id: "products",
+    label: "Products",
+    path: "/admin/products",
+    icon: <ShoppingBasket />,
+  },
+  {
+    id: "orders",
+    label: "Orders",
+    path: "/admin/orders",
+    icon: <CircleCheck />,
   },
 ];
