@@ -1,7 +1,5 @@
 //! Step-25, Create a config file for form for dynamic rendering
 
-import { CircleCheck, LayoutDashboard, ShoppingBasket } from "lucide-react";
-
 //! Step 25-1, Create register form controls
 export const registerFormControls = [
   {
@@ -45,23 +43,65 @@ export const loginFormControls = [
   },
 ];
 
-export const adminSidebarMenuItems = [
+//! Step-25-3, Create add Product configs
+export const addProductFormElements = [
   {
-    id: "dashboard",
-    label: "dashboard",
-    path: "/admin/dashboard",
-    icon: <LayoutDashboard />,
+    label: "Title",
+    name: "title",
+    componentType: "input",
+    type: "text",
+    placeholder: "Enter product title",
   },
   {
-    id: "products",
-    label: "Products",
-    path: "/admin/products",
-    icon: <ShoppingBasket />,
+    label: "Description",
+    name: "description",
+    componentType: "textarea",
+    placeholder: "Enter product description",
   },
   {
-    id: "orders",
-    label: "Orders",
-    path: "/admin/orders",
-    icon: <CircleCheck />,
+    label: "Category",
+    name: "category",
+    componentType: "select",
+    options: [
+      { id: "men", label: "Men" },
+      { id: "women", label: "Women" },
+      { id: "kids", label: "Kids" },
+      { id: "accessories", label: "Accessories" },
+      { id: "footwear", label: "Footwear" },
+    ],
+  },
+  {
+    label: "Brand",
+    name: "brand",
+    componentType: "select",
+    options: [
+      { id: "nike", label: "Nike" },
+      { id: "adidas", label: "Adidas" },
+      { id: "puma", label: "Puma" },
+      { id: "levi", label: "Levi's" },
+      { id: "zara", label: "Zara" },
+      { id: "h&m", label: "H&M" },
+    ],
+  },
+  {
+    label: "Price",
+    name: "price",
+    componentType: "input",
+    type: "number",
+    placeholder: "Enter product price",
+  },
+  {
+    label: "Sale Price",
+    name: "salePrice",
+    componentType: "input",
+    type: "number",
+    placeholder: "Enter sale price (optional)",
+  },
+  {
+    label: "Total Stock",
+    name: "totalStock",
+    componentType: "input",
+    type: "number",
+    placeholder: "Enter total stock",
   },
 ];

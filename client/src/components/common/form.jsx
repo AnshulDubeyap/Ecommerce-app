@@ -1,11 +1,12 @@
 //! Step-24, Create a component common form
 
 import {
+  Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@radix-ui/react-select";
+} from "@/components/ui/select"; // ✅ Corrected import path
 import { Textarea } from "../ui/textarea";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
@@ -66,17 +67,16 @@ function CommonForm({
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder={getControlItem.placeholder} />
-              <SelectContent>
-                {getControlItem.option && getControlItem.option.length > 0
-                  ? getControlItem.option.map((optionItem) => (
-                      <SelectItem
-                        key={optionItem.id}
-                        value={optionItem.id}
-                      ></SelectItem>
-                    ))
-                  : null}
-              </SelectContent>
             </SelectTrigger>
+            <SelectContent>
+              {getControlItem.options && getControlItem.options.length > 0
+                ? getControlItem.options.map((optionItem) => (
+                    <SelectItem key={optionItem.id} value={optionItem.id}>
+                      {optionItem.label}
+                    </SelectItem>
+                  ))
+                : null}
+            </SelectContent>
           </Select>
         );
         break;
@@ -124,6 +124,7 @@ function CommonForm({
     //! Step-24-6, return the element
     return element;
   }
+
   return (
     //! Step-24-9, add a onSubmit handler to the form and give it the onSubmit prop
     <form onSubmit={onSubmit}>

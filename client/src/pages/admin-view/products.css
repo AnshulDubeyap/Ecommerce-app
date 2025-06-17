@@ -1,0 +1,9 @@
+.product-button {
+  display: flex;
+  width: 100%;
+  justify-content: end;
+}
+
+.form-container {
+  padding: 3px 8px;
+}

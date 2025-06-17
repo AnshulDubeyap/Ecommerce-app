@@ -3,11 +3,16 @@
 import { AlignJustify, LogOut, Menu } from "lucide-react";
 import { Button } from "../ui/button";
 
-function AdminHeader() {
+function AdminHeader({ setOpen }) {
   return (
     <header className="flex items-center justify-between px-4 py-3 bg-background border-b">
       {/* Step-11-1, Add a menu button and icon  */}
-      <Button className="lg:hidden sm:block ">
+      <Button
+        className="lg:hidden sm:block"
+        onClick={() => {
+          setOpen(true);
+        }}
+      >
         {/* Import icon from lucide React */}
         <AlignJustify />
         {/* Give button a name */}
