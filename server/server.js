@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
+const adminProductsRouter = require("./routes/admin/products-routes");
+
 //! Step-3-4, Configure the routes for authentication
 const authRoute = require("./routes/auth/authRoute");
 
@@ -45,6 +47,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use("/api/auth", authRoute); //! Step-3-5, Use the authRoute
 
+app.use("/api/admin/products", adminProductsRouter);
 //! Run the Server
 app.listen(PORT, () => {
   console.log(`Server is now running in port ${PORT}`);

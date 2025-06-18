@@ -1,15 +1,18 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import "./image-upload.css";
 import { FileIcon, UploadCloudIcon, XIcon } from "lucide-react";
 import { Button } from "../ui/button";
+import axios from "axios";
 
 function ProductImageUpload({
   imageFile,
   setImageFile,
+  imageLoadingState,
   uploadedImageUrl,
   setUploadedImageUrl,
+  setImageLoadingState,
 }) {
   function handelImageFileChange(event) {
     console.log(event.target.files);
@@ -34,6 +37,30 @@ function ProductImageUpload({
     }
   }
   const inputRef = useRef();
+
+  function handelImageUploadToCloudinary() {
+    setImageLoadingState(true);
+    const data = new FormData();
+    data.append("my_file", imageFile);
+
+    const response = axios.post(
+      "http://localhost:5000/api/admin/products/upload-image",
+      data
+    );
+    console.log(response, "response");
+
+    if (response?.data?.success) {
+      setUploadedImageUrl(response.data.result.url);
+      setImageLoadingState(false);
+      console.log(response.data.result.url);
+    }
+  }
+
+  useEffect(() => {
+    if (imageFile !== null) {
+      handelImageUploadToCloudinary();
+    }
+  }, [imageFile]);
   return (
     <div className="container">
       <Label className="label">Upload Image</Label>
@@ -62,7 +89,7 @@ function ProductImageUpload({
               className="text-muted-foreground hover:text-foreground"
               onClick={handleRemoveImage}
             >
-              <XIcon className="w-4 h-4" />
+              <XIcon className="cancel-button-icon" />
               <span className="sr-only">Remove File</span>
             </Button>
           </div>

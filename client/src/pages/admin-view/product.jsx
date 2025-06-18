@@ -35,6 +35,8 @@ function AdminProducts() {
   const [imageFile, setImageFile] = useState(null);
   //! Step-13-7-2, Add a State variable for image url
   const [uploadedImageUrl, setUploadedImageUrl] = useState("");
+  //! Step-13-7-4, Add a State variable for loading state of image upload to cloudinary
+  const [imageLoadingState, setImageLoadingState] = useState(false);
   return (
     <Fragment>
       {/* Step 13-1, Add a button for creating a product */}
@@ -67,6 +69,8 @@ function AdminProducts() {
               setImageFile={setImageFile}
               uploadedImageUrl={uploadedImageUrl}
               setUploadedImageUrl={setUploadedImageUrl}
+              imageLoadingState={imageLoadingState}
+              setImageLoadingState={setImageLoadingState}
             />
             {/* Step-13-6, Render CommonForm and its properties */}
             <CommonForm
