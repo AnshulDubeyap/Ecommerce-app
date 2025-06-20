@@ -45,6 +45,25 @@ const loginUser = createAsyncThunk(
   }
 );
 
+//! Create a async thunk for user authentication(Logout)
+const logoutUser = createAsyncThunk(
+  "/auth/logout",
+
+  async () => {
+    //! Make a POST request to the server to register the user
+    const response = await axios.post(
+      "http://localhost:5000/api/auth/logout",
+      {},
+
+      {
+        withCredentials: true,
+      }
+    );
+    //! Return the response data
+    return response.data;
+  }
+);
+
 //! Creating a async thunk for middleware(cookies)
 const checkAuth = createAsyncThunk(
   "/auth/check-auth",
@@ -115,6 +134,11 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;
+      })
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.isLoading = false;
+        state.user = null;
+        state.isAuthenticated = false;
       });
   },
 });
@@ -122,4 +146,4 @@ const authSlice = createSlice({
 //! Step-3, Export the Reducer and action
 export const { setUser } = authSlice.actions;
 export default authSlice.reducer;
-export { registerUser, loginUser, checkAuth }; //! Export the async thunk for use in components
+export { registerUser, loginUser, checkAuth, logoutUser }; //! Export the async thunk for use in components

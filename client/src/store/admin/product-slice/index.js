@@ -46,7 +46,7 @@ const fetchAllProducts = createAsyncThunk(
 const editProduct = createAsyncThunk(
   "product/editProduct",
   //! Get the id of the product
-  async (id, formData) => {
+  async ({ id, formData }) => {
     const result = await axios.put(
       //! Dynamically pass the id (we will update the id)
       `http://localhost:5000/api/admin/products/edit/${id}`,

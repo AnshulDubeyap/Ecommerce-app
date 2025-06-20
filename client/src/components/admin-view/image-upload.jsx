@@ -14,6 +14,7 @@ function ProductImageUpload({
   uploadedImageUrl,
   setUploadedImageUrl,
   setImageLoadingState,
+  isEditMode,
 }) {
   function handelImageFileChange(event) {
     console.log(event.target.files);
@@ -72,6 +73,7 @@ function ProductImageUpload({
           type="file"
           ref={inputRef}
           onChange={handelImageFileChange}
+          disabled={isEditMode}
         />
         {!imageFile ? (
           <Label htmlFor="image-upload" className="drag-drop-label">

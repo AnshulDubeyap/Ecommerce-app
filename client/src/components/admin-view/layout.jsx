@@ -14,7 +14,7 @@ function AdminLayout() {
       <div className="flex flex-col flex-1">
         {/* Step-9-2, Admin header */}
         <AdminHeader setOpen={setOpenSideBar} />
-        <div className="flex flex-1 bg-muted/40 p-4 md:p-6">
+        <div className="flex flex-col flex-1 bg-muted/40 p-4 md:p-6 ">
           <Outlet />
         </div>
       </div>
