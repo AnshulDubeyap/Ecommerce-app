@@ -5,6 +5,7 @@ import "./image-upload.css";
 import { FileIcon, UploadCloudIcon, XIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import axios from "axios";
+import { Skeleton } from "../ui/skeleton";
 
 function ProductImageUpload({
   imageFile,
@@ -38,12 +39,12 @@ function ProductImageUpload({
   }
   const inputRef = useRef();
 
-  function handelImageUploadToCloudinary() {
+  async function handelImageUploadToCloudinary() {
     setImageLoadingState(true);
     const data = new FormData();
     data.append("my_file", imageFile);
 
-    const response = axios.post(
+    const response = await axios.post(
       "http://localhost:5000/api/admin/products/upload-image",
       data
     );
@@ -77,6 +78,8 @@ function ProductImageUpload({
             <UploadCloudIcon />
             <span>Drag & Drop image</span>
           </Label>
+        ) : imageLoadingState ? (
+          <Skeleton className="h-10 bg-gray-100" />
         ) : (
           <div className="file-info">
             <div className="file-description">
