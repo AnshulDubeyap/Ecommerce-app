@@ -50,7 +50,7 @@ function AuthLogin() {
         {/* Step-8-1, Import Link from routerDom */}
         <Link
           className="font-medium ml-2 text-primary hover:underline"
-          to="/auth/login"
+          to="/auth/register"
         >
           Register
         </Link>
