@@ -1,144 +1,182 @@
-//! Step-2, Create a authController.js to handle authentication logic
-
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../../models/User");
 
-//! Step-2-1, Register
-
 const registerUser = async (req, res) => {
-  //! Step-2-1-1, Destructure the request body to get userName, email, and password
   const { userName, email, password } = req.body;
 
+  if (!userName || !email || !password) {
+    return res.status(400).json({
+      success: false,
+      message: "userName, email, and password are required",
+    });
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid email format",
+    });
+  }
+
+  if (typeof password !== "string" || password.length < 6) {
+    return res.status(400).json({
+      success: false,
+      message: "Password must be at least 6 characters",
+    });
+  }
+
   try {
-    //! Step-2-1-2, Check if the user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(200).json({
+      return res.status(409).json({
         success: false,
         message: "User already exists with this email",
       });
     }
 
-    //! Step-2-1-3, Hash the password
+    const existingUserName = await User.findOne({ userName });
+    if (existingUserName) {
+      return res.status(409).json({
+        success: false,
+        message: "Username is already taken",
+      });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    //! Step-2-1-4, Create a new user instance
     const newUser = new User({
       userName,
       email,
-      password: hashedPassword, //! Store the hashed password
+      password: hashedPassword,
     });
 
-    //! Step-2-1-5, Save the user to the database
     await newUser.save();
 
-    res.json({
+    return res.status(201).json({
       success: true,
       message: "User registered successfully",
     });
   } catch (e) {
-    console.error("Error during registration:", e);
-    res.status(500).json({ success: false, message: "some error occurred" });
+    console.error("Registration error:", e);
+    return res.status(500).json({
+      success: false,
+      message: `Registration failed: ${e.message}`,
+    });
   }
 };
-
-//! Step-2-2, Login
 
 const loginUser = async (req, res) => {
-  //! Step-2-2-1, Destructure the request body to get email and password
   const { email, password } = req.body;
 
+  if (!email || !password) {
+    return res.status(400).json({
+      success: false,
+      message: "Email and password are required",
+    });
+  }
+
   try {
-    //! Step-2-2-2, Check if the user exists
-    const checkUser = await User.findOne({ email });
-    if (!checkUser) {
-      return res.status(200).json({
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
         success: false,
-        message: "User does not exist with this email, please register",
+        message: "User does not exist with this email",
       });
     }
 
-    //! Step-2-2-3, Compare the password with the hashed password
-    const checkPasswordMatch = await bcrypt.compare(
-      password,
-      checkUser.password
-    );
-
-    //! Step-2-2-4, If the password does not match, return an error
-    if (!checkPasswordMatch) {
-      return res.status(200).json({
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({
         success: false,
-        message: "Invalid password, please try again",
+        message: "Invalid password",
       });
     }
 
-    //! Step-2-2-5, Create a JWT token(if user is registered and password matches)
     const token = jwt.sign(
-      {
-        userId: checkUser._id,
-        role: checkUser.role,
-        email: checkUser.email,
-      },
-      "CLIENT_SECRET_KEY",
-      { expiresIn: "1d" } //! Token will expire in 1 day
+        {
+          userId: user._id,
+          role: user.role,
+          email: user.email,
+          userName: user.userName, // ✅ FIXED HERE
+        },
+        process.env.JWT_SECRET || "CLIENT_SECRET_KEY",
+        { expiresIn: "1d" }
     );
 
-    //! Step-2-2-6, Set the token in the cookie
-    res
-      .cookie("token", token, {
-        httpOnly: true, //! Cookie is not accessible via JavaScript
-        secure: false,
-      })
-      .json({
-        success: true,
-        message: "User logged in successfully",
-        user: {
-          id: checkUser._id,
-          email: checkUser.email,
-          role: checkUser.role,
-        },
-      });
+    return res
+        .cookie("token", token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+          maxAge: 24 * 60 * 60 * 1000,
+        })
+        .status(200)
+        .json({
+          success: true,
+          message: "User logged in successfully",
+          user: {
+            id: user._id,
+            email: user.email,
+            role: user.role,
+            userName: user.userName,
+          },
+        });
   } catch (e) {
-    console.error("Error during login:", e);
-    res.status(500).json({ success: false, message: "some error occurred" });
+    console.error("Login error:", e);
+    return res.status(500).json({
+      success: false,
+      message: `Login failed: ${e.message}`,
+    });
   }
 };
 
-//! Step-2-3, Logout
-
 const logoutUser = async (req, res) => {
-  //! Step-2-3, Clear the cookie
-  res.clearCookie("token").json({
-    success: true,
-    message: "User logged out successfully",
-  });
+  try {
+    return res
+        .clearCookie("token", {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+        })
+        .status(200)
+        .json({
+          success: true,
+          message: "User logged out successfully",
+        });
+  } catch (e) {
+    console.error("Logout error:", e);
+    return res.status(500).json({
+      success: false,
+      message: `Logout failed: ${e.message}`,
+    });
+  }
 };
 
-//! Step-2-4, Middleware
-
 const authMiddleware = (req, res, next) => {
-  //! Step-2-4-1, Get the token from the cookie
   const token = req.cookies.token;
 
-  //! Step-2-4-2, If the token does not exist, return an error
   if (!token) {
     return res.status(401).json({
       success: false,
       message: "Unauthorized, please login",
     });
   }
+
   try {
-    //! Step-2-4-3, Verify the token
-    const decoded = jwt.verify(token, "CLIENT_SECRET_KEY");
-    console.log("Decoded JWT →", decoded); // ✅ Add this to confirm
-    req.user = decoded; //! Attach the user to the request object
-    next(); //! Call the next middleware or route handler
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "CLIENT_SECRET_KEY");
+    req.user = decoded;
+    next();
   } catch (e) {
-    console.error("Error during authentication:", e);
-    res.status(401).json({ success: false, message: "Invalid token" });
+    console.error("Authentication error:", e);
+    return res.status(401).json({
+      success: false,
+      message: "Invalid or expired token",
+    });
   }
 };
+
 module.exports = {
   registerUser,
   loginUser,

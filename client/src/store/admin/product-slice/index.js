@@ -62,7 +62,7 @@ const editProduct = createAsyncThunk(
   }
 );
 
-//! Step-6, Create a async thunk for deleting a product
+//! Step-6, Create an async thunk for deleting a product
 const deleteProduct = createAsyncThunk(
   "product/deleteProduct",
   //! Get the id of the product
@@ -100,7 +100,10 @@ const adminProductSlice = createSlice({
       })
       .addCase(fetchAllProducts.pending, (state, action) => {
         state.isLoading = true;
-      });
+      }).addCase(deleteProduct.fulfilled, (state, action) => {
+            const deletedId = action.meta.arg;
+            state.productList = state.productList.filter((p) => p._id !== deletedId);
+        })
   },
 });
 

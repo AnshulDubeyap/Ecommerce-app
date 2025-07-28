@@ -5,7 +5,7 @@ import { Checkbox } from "../ui/checkbox";
 import { Separator } from "../ui/separator";
 
 //! Step-1 Create a Product Filter for Listing Page
-function ProductFilter() {
+function ProductFilter({filters, handleFilter}) {
   return (
     <div className="bg-background rounded-lg shadow-sm">
       <div className="p-4 border-b">
@@ -24,7 +24,8 @@ function ProductFilter() {
                 {filterOptions[keyItem].map((option) => (
                   <Label className="flex font-medium items-center gap-2 ">
                     {/* Step-1-5 Add a checkbox import it from schadcn */}
-                    <Checkbox />
+                    <Checkbox onCheckedChange={() => handleFilter(keyItem, option.id)}
+                    checked={filters && Object.keys(filters).length > 0 && filters[keyItem]?.includes(option.id)}/>
                     {/* Step-1-5 Add a option*/}
                     {option.label}
                   </Label>

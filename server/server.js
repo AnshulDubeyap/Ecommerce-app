@@ -4,51 +4,52 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
 const adminProductsRouter = require("./routes/admin/products-routes");
-
-//! Step-3-4, Configure the routes for authentication
 const authRoute = require("./routes/auth/authRoute");
+const productRoute = require("./routes/shop/productRoute");
 
-//! Create a Database Connection
 mongoose
-  .connect(
-    "mongodb+srv://dubeyanshul2204:KylGPOyqHd3zN9kx@cluster0.ng0yraz.mongodb.net/"
-  )
-  .then(() => {
-    console.log("MongoDB is Connected");
-  })
-  .catch((error) => {
-    console.log(error);
-  });
+    .connect(
+        "mongodb+srv://dubeyanshul2204:KylGPOyqHd3zN9kx@cluster0.ng0yraz.mongodb.net/myDatabase?retryWrites=true&w=majority" // Added database name
+    )
+    .then(() => console.log("MongoDB is Connected"))
+    .catch((error) => console.log("MongoDB error:", error));
 
-//! Create a App
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-//! Configure the cors
-//? Hey server, allow requests from my frontend app running at localhost:5173. Let it send or receive data, including login info, and allow specific request types and headers
+// Define /test route first
+app.get("/test", (req, res) => {
+    console.log("Test route hit at", new Date().toISOString());
+    res.json({ message: "Server is alive" });
+});
 
-//? app.use is simply app uses
+// Log all requests
+app.use((req, res, next) => {
+    console.log(`Request: ${req.method} ${req.url} at ${new Date().toISOString()}`, req.body);
+    next();
+});
+
 app.use(
-  cors({
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: [
-      "content-type",
-      "Authorization",
-      "Cache-control",
-      "Expires",
-      "Pragma",
-    ],
-    credentials: true,
-  })
+    cors({
+        origin: "http://localhost:5173",
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        allowedHeaders: [
+            "content-type",
+            "Authorization",
+            "Cache-control",
+            "Expires",
+            "Pragma",
+        ],
+        credentials: true,
+    })
 );
 
 app.use(cookieParser());
 app.use(express.json());
-app.use("/api/auth", authRoute); //! Step-3-5, Use the authRoute
-
+app.use("/api/auth", authRoute);
 app.use("/api/admin/products", adminProductsRouter);
-//! Run the Server
+app.use("/api/shop/products", productRoute);
+
 app.listen(PORT, () => {
-  console.log(`Server is now running in port ${PORT}`);
+    console.log(`Server is now running in port ${PORT} at ${new Date().toISOString()}`);
 });

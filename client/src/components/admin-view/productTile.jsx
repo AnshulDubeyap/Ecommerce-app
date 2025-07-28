@@ -53,7 +53,9 @@ function AdminProductTile({
           >
             Edit
           </Button>
-          <Button onClick={() => handleDelete(product?._id)}>Delete</Button>
+          <Button onClick={() => { if (window.confirm("Are you sure you want to delete this product?")) {
+            handleDelete(product?._id);
+          }}}>Delete</Button>
         </CardFooter>
       </div>
     </Card>

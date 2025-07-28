@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Fragment, use, useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import "./products.css";
 import {
   Sheet,
@@ -15,6 +15,7 @@ import {
   addNewProduct,
   editProduct,
   fetchAllProducts,
+    deleteProduct,
 } from "@/store/admin/product-slice";
 import { toast } from "sonner";
 import AdminProductTile from "@/components/admin-view/productTile";
@@ -170,8 +171,13 @@ function AdminProducts() {
                 setFormData={setFormData}
                 product={productItem}
                 handleDelete={(id) => {
-                  // You can pass your own delete logic here
-                  console.log("Delete product", id);
+                  dispatch(deleteProduct(id)).then((res) => {
+                    if (res?.payload?.success) {
+                      toast.success("Product deleted successfully");
+                    } else {
+                      toast.error("Failed to delete product");
+                    }
+                  });
                 }}
               />
             ))
