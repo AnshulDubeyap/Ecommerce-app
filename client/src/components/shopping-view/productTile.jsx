@@ -1,47 +1,68 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {categoryOptionsMap} from "@/config/index.jsx";
-import {brandOptionsMap} from "@/config/index.jsx";
+import { categoryOptionsMap, brandOptionsMap } from "@/config/index.jsx";
 
-function ShoppingProductTile({ product }) {
+function ShoppingProductTile({ product, HandleProductDetails }) {
     console.log("PRODUCT DATA:", product);
+
     return (
-
-        <Card className="w-full max-w-sm mx-auto">
-            <div className="relative">
-                {/* Step-1-2, Get the image from the product */}
-                <img
-                    src={product?.image}
-                    alt={product?.title}
-                    className="w-full h-[300px] object-cover rounded-t-lg"
-                />
-                {product?.salePrice > 0 && (
-                    <Badge className="absolute top-2 left-2 bg-red-500 hover:bg-red-600">Sale</Badge>
-                )}
-            </div>
-
-            <CardContent className="p-4">
-                <h2 className="text-xl font-bold mb-2 mt-2">{product?.title}</h2>
-                <div className="flex justify-between items-center mb-2">
-                    <span className="text-muted-foreground text-[16px]">{categoryOptionsMap[product?.category]}</span>
-                    <span className="text-muted-foreground text-[16px]">{brandOptionsMap[product?.brand]}</span>
-                </div>
-
-                <div className="flex justify-between items-center">
-          <span
-              className={`${
-                  product?.salePrice > 0 ? "line-through" : ""
-              } text-lg font-semibold text-primary`}
-          >
-            ₹{product?.price}
-          </span>
+        <Card className="w-full max-w-sm mx-auto bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <div
+                onClick={() => {
+                    console.log("Product ID:", product._id);
+                    HandleProductDetails(product._id);
+                }}
+                className="cursor-pointer"
+            >
+                <div className="relative overflow-hidden rounded-t-xl">
+                    <img
+                        src={product?.image}
+                        alt={product?.title}
+                        className="w-full h-[300px] object-cover transition-transform duration-300 hover:scale-105"
+                    />
                     {product?.salePrice > 0 && (
-                        <span className="text-lg font-semibold text-primary">
-              ₹{product?.salePrice}
-            </span>
+                        <Badge className="absolute top-3 left-3 bg-red-500 hover:bg-red-600 text-white font-medium px-3 py-1 text-sm rounded-full shadow-sm">
+                            Sale
+                        </Badge>
                     )}
                 </div>
-            </CardContent>
+
+                <CardContent className="p-5 flex flex-col gap-3">
+                    <h2 className="text-xl font-semibold text-gray-800 line-clamp-2">
+                        {product?.title}
+                    </h2>
+
+                    <div className="flex justify-between items-center text-sm text-gray-500">
+                        <span className="bg-gray-100 px-2 py-1 rounded-md">
+                            {categoryOptionsMap[product?.category]}
+                        </span>
+                        <span className="bg-gray-100 px-2 py-1 rounded-md">
+                            {brandOptionsMap[product?.brand]}
+                        </span>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                        <span
+                            className={`text-lg font-semibold ${
+                                product?.salePrice > 0
+                                    ? "text-gray-400 line-through"
+                                    : "text-primary"
+                            }`}
+                        >
+                            ₹{product?.price}
+                        </span>
+                        {product?.salePrice > 0 && (
+                            <span className="text-lg font-semibold text-green-600">
+                                ₹{product?.salePrice}
+                            </span>
+                        )}
+                    </div>
+
+                    <button className="mt-3 w-full py-2 bg-primary text-white rounded-lg font-medium text-sm hover:bg-primary-dark transition-colors duration-200">
+                        View Details
+                    </button>
+                </CardContent>
+            </div>
         </Card>
     );
 }

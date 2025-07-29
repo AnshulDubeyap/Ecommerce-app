@@ -1,6 +1,4 @@
-//! Step-21,Create the home page in the shopping-view
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ProductFilter from "@/components/shopping-view/filter";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,14 +9,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ArrowUpDownIcon } from "lucide-react";
-import { useDispatch } from "react-redux";
-import { useEffect } from "react";
-import { fetchAllFilteredProducts } from "@/store/shop/products-slice";
-import { useSelector } from "react-redux";
-import ShoppingProductTile from "@/components/shopping-view/productTile";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAllFilteredProducts, fetchProductDetails } from "@/store/shop/products-slice";
 import { useSearchParams } from "react-router-dom";
+import ShoppingProductTile from "@/components/shopping-view/productTile";
+import ProductDetailsDialog from "@/components/shopping-view/product-details.jsx";
 
-//! Step-21-0, Create sorting options
 const sortOptions = [
   { id: "price-low-high", label: "Price: Low to High" },
   { id: "price-high-low", label: "Price: High to Low" },
@@ -27,82 +23,58 @@ const sortOptions = [
 ];
 
 function createSearchParamsHelper(filterParams) {
-  const queryParams = []
-
-  for(const [key, value] of Object.entries(filterParams)) {
-    if(Array.isArray(value) && value.length > 0) {
-      const ParamValue = value.join(',')
-      queryParams.push(`${key}=${encodeURIComponent(ParamValue)}`)
+  const queryParams = [];
+  for (const [key, value] of Object.entries(filterParams)) {
+    if (Array.isArray(value) && value.length > 0) {
+      const paramValue = value.join(",");
+      queryParams.push(`${key}=${encodeURIComponent(paramValue)}`);
     }
   }
-  return queryParams.join('&')
+  return queryParams.join("&");
 }
 
 function ShoppingListing() {
-  // fetch products
   const dispatch = useDispatch();
-  const { productList } = useSelector((state) => state.shopProducts);
-  console.log(productList);
-
-  //! Step-21-1, Create a grid layout for the listing page
-  const [sort, setSort] = useState(null);
+  const { productList, productDetails } = useSelector((state) => state.shopProducts);
+  const [sort, setSort] = useState("price-low-high");
   const [filters, setFilters] = useState({});
   const [searchParams, setSearchParams] = useSearchParams();
-
-  console.log(searchParams);
+  const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
 
   function handleSort(value) {
-    console.log(value);
     setSort(value);
-    // You can add product reordering logic here
   }
 
   function handleFilter(getSectionId, getCurrentOption) {
-    console.log(getSectionId, getCurrentOption);
-
-    // copy filters
     const updatedFilters = { ...filters };
-
-    // if the section exists, toggle the option
     if (updatedFilters[getSectionId]) {
       const index = updatedFilters[getSectionId].indexOf(getCurrentOption);
-
       if (index !== -1) {
-        // remove if already selected
         updatedFilters[getSectionId].splice(index, 1);
       } else {
-        // add new selection
         updatedFilters[getSectionId].push(getCurrentOption);
       }
-
-      // remove the key if empty
       if (updatedFilters[getSectionId].length === 0) {
         delete updatedFilters[getSectionId];
       }
     } else {
-      // section doesn't exist, create it
       updatedFilters[getSectionId] = [getCurrentOption];
     }
-
-    console.log(updatedFilters);
-
     setFilters(updatedFilters);
-
-    // set the filters in session storage
     sessionStorage.setItem("filters", JSON.stringify(updatedFilters));
   }
 
-  // default sort and filters on page load
   useEffect(() => {
-    setSort('price-low-high');
-    setFilters(JSON.parse(sessionStorage.getItem('filters')) || {});
+    setSort("price-low-high");
+    setFilters(JSON.parse(sessionStorage.getItem("filters")) || {});
   }, []);
 
-  // useSearchParams for getting category and brand
   useEffect(() => {
-    if(filters && Object.keys(filters).length > 0) {
-      const createqueryString = createSearchParamsHelper(filters);
-      setSearchParams(new URLSearchParams(createqueryString));
+    if (Object.keys(filters).length > 0) {
+      const queryString = createSearchParamsHelper(filters);
+      setSearchParams(new URLSearchParams(queryString));
+    } else {
+      setSearchParams(new URLSearchParams());
     }
   }, [filters]);
 
@@ -112,42 +84,52 @@ function ShoppingListing() {
     }
   }, [dispatch, sort, filters]);
 
-  console.log(filters);
+  useEffect(() => {
+    if (productDetails) {
+      setOpenDetailsDialog(true);
+    }
+  }, [productDetails]);
+
+  const handleProductDetails = (getCurrentProductId) => {
+    dispatch(fetchProductDetails(getCurrentProductId));
+  };
 
   return (
-      <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6">
-        {/* Step-21-2, Render the Product Filter from filter.jsx */}
-        <ProductFilter filters={filters} handleFilter={handleFilter} />
+      <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-6 p-4 sm:p-6 lg:p-8 bg-gray-50 min-h-screen">
+        {/* Filter Panel */}
+        <div className="bg-white rounded-xl shadow-md p-6 sticky top-4 h-fit">
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">Filters</h2>
+          <ProductFilter filters={filters} handleFilter={handleFilter} />
+        </div>
 
-        {/* Step-21-3, Create the main product display panel */}
-        <div className="bg-background w-full rounded-lg shadow-sm">
-          <div className="p-4 border-b flex items-center justify-between">
-            <h2 className="text-lg font-extrabold">All Products</h2>
-            {/* Step-21-4, Add number of products */}
-            <div className="flex items-center gap-3">
-              <span className="text-muted-foreground">{productList.length} Products</span>
-            </div>
-            {/* Step-21-5, Create a dropdown menu for sorting products */}
-            <div className="flex items-center gap-3">
+        {/* Main Product Display */}
+        <div className="bg-white rounded-xl shadow-md">
+          <div className="p-4 sm:p-6 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
+              All Products
+            </h2>
+            <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-500 font-medium">
+              {productList.length} Products
+            </span>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  {/* Step-21-5-1, Render the sort button with icon */}
                   <Button
                       variant="outline"
                       size="sm"
-                      className="flex items-center gap-1"
+                      className="flex items-center gap-2 text-gray-700 border-gray-300 hover:bg-gray-100 transition-colors duration-200"
                   >
                     <ArrowUpDownIcon className="h-4 w-4" />
-                    <span>Sort by</span>
+                    <span>Sort by: {sortOptions.find((opt) => opt.id === sort)?.label}</span>
                   </Button>
                 </DropdownMenuTrigger>
-                {/* Step-21-5-2, Render the sort options */}
-                <DropdownMenuContent align="end" className="w-[200px]">
+                <DropdownMenuContent align="end" className="w-[200px] bg-white shadow-lg rounded-lg p-2">
                   <DropdownMenuRadioGroup value={sort} onValueChange={handleSort}>
                     {sortOptions.map((sortItem) => (
                         <DropdownMenuRadioItem
-                            value={sortItem.id}
                             key={sortItem.id}
+                            value={sortItem.id}
+                            className="text-sm text-gray-700 hover:bg-gray-100 rounded-md px-3 py-2"
                         >
                           {sortItem.label}
                         </DropdownMenuRadioItem>
@@ -158,13 +140,29 @@ function ShoppingListing() {
             </div>
           </div>
 
-          {/* Step-21-5, Products would be rendered here in future */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-6 p-4">
-            {productList.map((product) => (
-                <ShoppingProductTile key={product._id} product={product} />
-            ))}
+          {/* Product Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4 sm:p-6">
+            {productList.length > 0 ? (
+                productList.map((product) => (
+                    <ShoppingProductTile
+                        key={product._id}
+                        product={product}
+                        HandleProductDetails={handleProductDetails}
+                    />
+                ))
+            ) : (
+                <div className="col-span-full text-center py-12">
+                  <p className="text-gray-500 text-lg">No products found.</p>
+                </div>
+            )}
           </div>
         </div>
+
+        <ProductDetailsDialog
+            open={openDetailsDialog}
+            setOpen={setOpenDetailsDialog}
+            productDetails={productDetails}
+        />
       </div>
   );
 }

@@ -2,8 +2,9 @@ const express = require("express");
 const router = express.Router();
 
 
-const { getFilteredProducts } = require("../../controllers/shop/shopController");
+const { getFilteredProducts, getProductDetails } = require("../../controllers/shop/shopController");
 
 router.get("/get", getFilteredProducts);
+router.get("/get/:id", getProductDetails);
 
 module.exports = router;
