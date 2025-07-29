@@ -15,7 +15,7 @@ import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { fetchAllFilteredProducts } from "@/store/shop/products-slice";
 import { useSelector } from "react-redux";
-import ProductTile from "@/components/shopping-view/productTile";
+import ShoppingProductTile from "@/components/shopping-view/productTile";
 import { useSearchParams } from "react-router-dom";
 
 //! Step-21-0, Create sorting options
@@ -43,11 +43,6 @@ function ShoppingListing() {
   const dispatch = useDispatch();
   const { productList } = useSelector((state) => state.shopProducts);
   console.log(productList);
-
-  useEffect(() => {
-    dispatch(fetchAllFilteredProducts());
-  }, [dispatch]);
-
 
   //! Step-21-1, Create a grid layout for the listing page
   const [sort, setSort] = useState(null);
@@ -108,66 +103,69 @@ function ShoppingListing() {
     if(filters && Object.keys(filters).length > 0) {
       const createqueryString = createSearchParamsHelper(filters);
       setSearchParams(new URLSearchParams(createqueryString));
-
-
     }
-
   }, [filters]);
+
+  useEffect(() => {
+    if (sort !== null && filters !== null) {
+      dispatch(fetchAllFilteredProducts({ filterParams: filters, sortParams: sort }));
+    }
+  }, [dispatch, sort, filters]);
 
   console.log(filters);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6">
-      {/* Step-21-2, Render the Product Filter from filter.jsx */}
-      <ProductFilter filters={filters} handleFilter={handleFilter} />
+      <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6">
+        {/* Step-21-2, Render the Product Filter from filter.jsx */}
+        <ProductFilter filters={filters} handleFilter={handleFilter} />
 
-      {/* Step-21-3, Create the main product display panel */}
-      <div className="bg-background w-full rounded-lg shadow-sm">
-        <div className="p-4 border-b flex items-center justify-between">
-          <h2 className="text-lg font-extrabold">All Products</h2>
-          {/* Step-21-4, Add number of products */}
-          <div className="flex items-center gap-3">
-            <span className="text-muted-foreground">{productList.length} Products</span>
+        {/* Step-21-3, Create the main product display panel */}
+        <div className="bg-background w-full rounded-lg shadow-sm">
+          <div className="p-4 border-b flex items-center justify-between">
+            <h2 className="text-lg font-extrabold">All Products</h2>
+            {/* Step-21-4, Add number of products */}
+            <div className="flex items-center gap-3">
+              <span className="text-muted-foreground">{productList.length} Products</span>
+            </div>
+            {/* Step-21-5, Create a dropdown menu for sorting products */}
+            <div className="flex items-center gap-3">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  {/* Step-21-5-1, Render the sort button with icon */}
+                  <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex items-center gap-1"
+                  >
+                    <ArrowUpDownIcon className="h-4 w-4" />
+                    <span>Sort by</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                {/* Step-21-5-2, Render the sort options */}
+                <DropdownMenuContent align="end" className="w-[200px]">
+                  <DropdownMenuRadioGroup value={sort} onValueChange={handleSort}>
+                    {sortOptions.map((sortItem) => (
+                        <DropdownMenuRadioItem
+                            value={sortItem.id}
+                            key={sortItem.id}
+                        >
+                          {sortItem.label}
+                        </DropdownMenuRadioItem>
+                    ))}
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
-          {/* Step-21-5, Create a dropdown menu for sorting products */}
-          <div className="flex items-center gap-3">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                {/* Step-21-5-1, Render the sort button with icon */}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-1"
-                >
-                  <ArrowUpDownIcon className="h-4 w-4" />
-                  <span>Sort by</span>
-                </Button>
-              </DropdownMenuTrigger>
-              {/* Step-21-5-2, Render the sort options */}
-              <DropdownMenuContent align="end" className="w-[200px]">
-                <DropdownMenuRadioGroup value={sort} onValueChange={handleSort}>
-                  {sortOptions.map((sortItem) => (
-                    <DropdownMenuRadioItem
-                      value={sortItem.id}
-                      key={sortItem.id}
-                    >
-                      {sortItem.label}
-                    </DropdownMenuRadioItem>
-                  ))}
-                </DropdownMenuRadioGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
 
-        {/* Step-21-5, Products would be rendered here in future */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-6 p-4">
-          {productList.map((product) => (
-            <ProductTile key={product._id} product={product} />
-          ))}
+          {/* Step-21-5, Products would be rendered here in future */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-6 p-4">
+            {productList.map((product) => (
+                <ShoppingProductTile key={product._id} product={product} />
+            ))}
+          </div>
         </div>
       </div>
-    </div>
   );
 }
 
