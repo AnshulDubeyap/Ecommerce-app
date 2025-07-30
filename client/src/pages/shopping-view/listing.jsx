@@ -14,6 +14,8 @@ import { fetchAllFilteredProducts, fetchProductDetails } from "@/store/shop/prod
 import { useSearchParams } from "react-router-dom";
 import ShoppingProductTile from "@/components/shopping-view/productTile";
 import ProductDetailsDialog from "@/components/shopping-view/product-details.jsx";
+import {addToCart} from "@/store/shop/cart-slice";
+
 
 const sortOptions = [
   { id: "price-low-high", label: "Price: Low to High" },
@@ -36,6 +38,7 @@ function createSearchParamsHelper(filterParams) {
 function ShoppingListing() {
   const dispatch = useDispatch();
   const { productList, productDetails } = useSelector((state) => state.shopProducts);
+  const { user } = useSelector((state) => state.auth);
   const [sort, setSort] = useState("price-low-high");
   const [filters, setFilters] = useState({});
   const [searchParams, setSearchParams] = useSearchParams();
@@ -62,6 +65,18 @@ function ShoppingListing() {
     }
     setFilters(updatedFilters);
     sessionStorage.setItem("filters", JSON.stringify(updatedFilters));
+  }
+
+  function handleAddToCart(getCurrentProductId) {
+    console.log("Product ID:", getCurrentProductId);
+    dispatch(addToCart({
+      userId: user?._id,
+      productId: getCurrentProductId,
+      quantity: 1
+    })).then((data) => {
+      console.log("Product added to cart:", data);
+    });
+
   }
 
   useEffect(() => {
@@ -97,13 +112,13 @@ function ShoppingListing() {
   return (
       <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-6 p-4 sm:p-6 lg:p-8 bg-gray-50 min-h-screen">
         {/* Filter Panel */}
-        <div className="bg-white rounded-xl shadow-md p-6 sticky top-4 h-fit">
+        <div className="bg-white rounded-xl p-6 sticky top-4 h-fit">
           <h2 className="text-lg font-semibold text-gray-800 mb-4">Filters</h2>
           <ProductFilter filters={filters} handleFilter={handleFilter} />
         </div>
 
         {/* Main Product Display */}
-        <div className="bg-white rounded-xl shadow-md">
+        <div className="bg-white rounded-xl">
           <div className="p-4 sm:p-6 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
               All Products
@@ -148,6 +163,7 @@ function ShoppingListing() {
                         key={product._id}
                         product={product}
                         HandleProductDetails={handleProductDetails}
+                        handleAddToCart={handleAddToCart}
                     />
                 ))
             ) : (

@@ -6,6 +6,7 @@ const cors = require("cors");
 const adminProductsRouter = require("./routes/admin/products-routes");
 const authRoute = require("./routes/auth/authRoute");
 const productRoute = require("./routes/shop/productRoute");
+const cartRoute = require("./routes/shop/cartRoute");
 
 mongoose
     .connect(
@@ -49,6 +50,7 @@ app.use(express.json());
 app.use("/api/auth", authRoute);
 app.use("/api/admin/products", adminProductsRouter);
 app.use("/api/shop/products", productRoute);
+app.use("/api/shop/cart", cartRoute);
 
 app.listen(PORT, () => {
     console.log(`Server is now running in port ${PORT} at ${new Date().toISOString()}`);

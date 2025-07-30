@@ -4,8 +4,11 @@ import { HousePlug, LogOut, Menu, UserCog } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Button } from "../ui/button";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector, } from "react-redux";
+import { useState } from "react";
 import { shoppingViewHeaderMenuItems } from "@/config";
+import UserCartWrapper from "../../components/shopping-view/cart-wrapper";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,6 +43,7 @@ function HeaderRightContent() {
   console.log(user, "user");
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [openCartSheet, setOpenCartSheet] = useState(false);
 
   function handleLogout() {
     dispatch(logoutUser());
@@ -48,10 +52,13 @@ function HeaderRightContent() {
 
   return (
       <div className="flex items-center gap-4">
-        <Button variant='outline' size="icon">
-          <ShoppingCart className="h-6 w-6" />
-          <span className="sr-only">User Cart</span>
-        </Button>
+        <Sheet open={openCartSheet} onOpenChange={()=> setOpenCartSheet(false)}>
+          <Button variant='outline' size="icon" onClick={() => setOpenCartSheet(true)}>
+            <ShoppingCart className="h-6 w-6" />
+            <span className="sr-only">User Cart</span>
+          </Button>
+          <UserCartWrapper />
+        </Sheet>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Avatar className="bg-black cursor-pointer">

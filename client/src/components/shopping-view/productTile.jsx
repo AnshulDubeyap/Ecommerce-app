@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { categoryOptionsMap, brandOptionsMap } from "@/config/index.jsx";
 
-function ShoppingProductTile({ product, HandleProductDetails }) {
+function ShoppingProductTile({ product, HandleProductDetails, handleAddToCart }) {
     console.log("PRODUCT DATA:", product);
 
     return (
@@ -49,17 +49,20 @@ function ShoppingProductTile({ product, HandleProductDetails }) {
                                     : "text-primary"
                             }`}
                         >
-                            ₹{product?.price}
+                            ${product?.price}
                         </span>
                         {product?.salePrice > 0 && (
                             <span className="text-lg font-semibold text-green-600">
-                                ₹{product?.salePrice}
+                                ${product?.salePrice}
                             </span>
                         )}
                     </div>
 
-                    <button className="mt-3 w-full py-2 bg-primary text-white rounded-lg font-medium text-sm hover:bg-primary-dark transition-colors duration-200">
-                        View Details
+                    <button
+                        onClick={() => handleAddToCart(product._id)}
+                        className="mt-3 w-full py-2 bg-primary text-white rounded-lg font-medium text-sm hover:bg-primary-dark transition-colors duration-200"
+                    >
+                        Add to Cart
                     </button>
                 </CardContent>
             </div>
