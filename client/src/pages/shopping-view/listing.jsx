@@ -70,7 +70,7 @@ function ShoppingListing() {
   function handleAddToCart(getCurrentProductId) {
     console.log("Product ID:", getCurrentProductId);
     dispatch(addToCart({
-      userId: user?._id,
+      userId: user?.id,
       productId: getCurrentProductId,
       quantity: 1
     })).then((data) => {
